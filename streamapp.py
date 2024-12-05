@@ -52,7 +52,7 @@ def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withd
         # Calculate dynamic interest rate
         years_after_retirement = age - retirement_age
         x = (100 - age) / 100
-        y = 100 - x  # Percentage for `post_annual_rate`
+        y = 1 - x  # Percentage for `post_annual_rate`
 
         # Calculate interest
         interest = balance * (x / 100 * annual_rate / 12 / 100 + y / 100 * post_annual_rate / 12 / 100)
