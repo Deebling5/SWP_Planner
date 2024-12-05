@@ -35,15 +35,17 @@ def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withd
         # Calculate dynamic percentage split
         age = retirement_age + (month // 12)
         years_after_retirement = age - retirement_age
-        x = max(50 - (years_after_retirement * 5), 0)  # Percentage for `annual_rate` (reduces by 5% every 5 years)
-        y = 100 - x  # Percentage for `post_annual_rate`
+        x = min(0.5 + 0.05 * (years_after_retirement // 5), 1)
+        y = 1 - x
+        #x = max(50 - (years_after_retirement * 5), 0)  # Percentage for `annual_rate` (reduces by 5% every 5 years)
+        #y = 100 - x  # Percentage for `post_annual_rate`
 
         # Adjust monthly withdrawal for inflation yearly
         if month % 12 == 0:
             monthly_withdrawal *= (1 + inflation_rate / 100)
 
         # Calculate interest
-        interest = balance * (x / 100 * annual_rate / 12 / 100 + y / 100 * post_annual_rate / 12 / 100)
+        interest = balance * (y * annual_rate / 12 / 100 + x * post_annual_rate / 12 / 100)
         balance = balance + interest - monthly_withdrawal
 
         # Check for negative balance
