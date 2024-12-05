@@ -1,14 +1,20 @@
 import pandas as pd
 import streamlit as st
 
-
-def sip_planner(monthly_investment, annual_rate, years, step_up_rate):
+def sip_planner(monthly_investment, annual_rate, years, step_up_rate, initial_investment, lumpsum_year, lumpsum_amount, current_age):
     months = years * 12
     monthly_rate = annual_rate / 12 / 100
     balances, invested_amounts, interest_amounts = [], [], []
-    balance, total_invested = 0, 0
+    balance, total_invested = initial_investment, initial_investment
 
     for month in range(1, months + 1):
+        year = current_age + (month // 12)
+        
+        # Add lumpsum if it matches the configured year
+        if lumpsum_year == year and month % 12 == 1:
+            balance += lumpsum_amount
+            total_invested += lumpsum_amount
+
         # Increase monthly investment yearly based on step-up rate
         if month % 12 == 1 and month != 1:
             monthly_investment *= (1 + step_up_rate / 100)
@@ -25,25 +31,31 @@ def sip_planner(monthly_investment, annual_rate, years, step_up_rate):
     return balances, invested_amounts, interest_amounts
 
 
-def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withdrawal, years, inflation_rate, retirement_age):
+def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withdrawal, years, inflation_rate, retirement_age, lumpsum_year, lumpsum_amount):
     months = years * 12
     balance = initial_investment
     balances, interest_earned, money_withdrawn = [], [], []
     balance_negative_month = None
 
     for month in range(1, months + 1):
-        # Calculate dynamic percentage split
         age = retirement_age + (month // 12)
-        years_after_retirement = age - retirement_age
-        x = (100 - age) / 100
-        y = 1 - x
+        year = age
+        
+        # Add lumpsum if it matches the configured year
+        if lumpsum_year == year and month % 12 == 1:
+            balance += lumpsum_amount
 
         # Adjust monthly withdrawal for inflation yearly
         if month % 12 == 0:
             monthly_withdrawal *= (1 + inflation_rate / 100)
 
+        # Calculate dynamic interest rate
+        years_after_retirement = age - retirement_age
+        x = (100 - age) / 100
+        y = 100 - x  # Percentage for `post_annual_rate`
+
         # Calculate interest
-        interest = balance * (x * annual_rate / 12 / 100 + y * post_annual_rate / 12 / 100)
+        interest = balance * (x / 100 * annual_rate / 12 / 100 + y / 100 * post_annual_rate / 12 / 100)
         balance = balance + interest - monthly_withdrawal
 
         # Check for negative balance
@@ -64,17 +76,21 @@ def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withd
 st.title("SIP & SWP Planner")
 
 # Input fields
-current_age = st.number_input("Current Age", min_value=28, max_value=100, value=30)
-retirement_age = st.number_input("Expected Age to Retire", min_value=current_age + 1, max_value=100, value=45)
-expected_death_age = st.number_input("Expected Age of Death", min_value=retirement_age + 1, max_value=120, value=90)
+current_age = st.number_input("Current Age", min_value=18, max_value=100, value=30)
+retirement_age = st.number_input("Expected Age to Retire", min_value=current_age + 1, max_value=100, value=60)
+expected_death_age = st.number_input("Expected Age of Death", min_value=retirement_age + 1, max_value=120, value=85)
 
-monthly_investment = st.number_input("Monthly SIP Installment (₹)", min_value=1000, value=30000)
-step_up_rate = st.number_input("Annual Step-Up Rate (%)", min_value=0.0, value=2.0)
-sip_annual_rate = st.number_input("Annual Rate of Return During SIP (%)", min_value=0.0, value=13.0)
+monthly_investment = st.number_input("Monthly SIP Installment (₹)", min_value=1000, value=5000)
+step_up_rate = st.number_input("Annual Step-Up Rate (%)", min_value=0.0, value=5.0)
+sip_annual_rate = st.number_input("Annual Rate of Return During SIP (%)", min_value=0.0, value=12.0)
+initial_investment = st.number_input("Initial Investment Before SIP Starts (₹)", min_value=0, value=100000)
 
-monthly_withdrawal = st.number_input("Monthly SWP Withdrawal (₹)", min_value=1000, value=100000)
-post_annual_rate = st.number_input("Post-Retirement Annual Rate of Return (%)", min_value=0.0, value=8.0)
-inflation_rate = st.number_input("Annual Inflation Rate (%)", min_value=0.0, value=7.0)
+monthly_withdrawal = st.number_input("Monthly SWP Withdrawal (₹)", min_value=1000, value=20000)
+post_annual_rate = st.number_input("Post-Retirement Annual Rate of Return (%)", min_value=0.0, value=6.0)
+inflation_rate = st.number_input("Annual Inflation Rate (%)", min_value=0.0, value=3.0)
+
+lumpsum_year = st.number_input("Year for Lumpsum Addition (Optional)", min_value=current_age, max_value=expected_death_age, value=0)
+lumpsum_amount = st.number_input("Lumpsum Amount (₹)", min_value=0, value=0)
 
 # Calculations
 years_to_retirement = retirement_age - current_age
@@ -83,14 +99,18 @@ years_of_withdrawal = expected_death_age - retirement_age
 if st.button("Calculate"):
     # SIP calculations
     sip_balances, invested_amounts, interest_amounts = sip_planner(
-        monthly_investment, sip_annual_rate, years_to_retirement, step_up_rate
+        monthly_investment, sip_annual_rate, years_to_retirement, step_up_rate, initial_investment, lumpsum_year, lumpsum_amount, current_age
     )
     sip_future_value = sip_balances[-1] if sip_balances else 0
 
     # SWP calculations
     swp_balances, interest_earned, money_withdrawn, balance_negative_month = swp_planner(
-        sip_future_value, sip_annual_rate, post_annual_rate, monthly_withdrawal, years_of_withdrawal, inflation_rate, retirement_age
+        sip_future_value, sip_annual_rate, post_annual_rate, monthly_withdrawal, years_of_withdrawal, inflation_rate, retirement_age, lumpsum_year, lumpsum_amount
     )
+
+    # Yearly expenses multiplier
+    yearly_expenses = monthly_withdrawal * 12
+    multiplier = sip_future_value / yearly_expenses if yearly_expenses > 0 else 0
 
     # Calculate the year when the balance goes negative
     if balance_negative_month:
@@ -101,6 +121,7 @@ if st.button("Calculate"):
 
     # Display SIP results
     st.subheader("SIP Results")
+    st.write(f"SIP Balance at Retirement: ₹{sip_future_value:,.0f} ({multiplier:.1f}x of yearly expenses)")
     st.line_chart(sip_balances)
     sip_data = pd.DataFrame({
         "Month": list(range(1, len(sip_balances) + 1)),
