@@ -57,15 +57,15 @@ def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withd
 st.title("SIP & SWP Planner")
 
 # Input fields
-current_age = st.number_input("Current Age", min_value=18, max_value=100, value=30)
-retirement_age = st.number_input("Expected Age to Retire", min_value=18, max_value=100, value=60)
-death_age = st.number_input("Expected Age of Death", min_value=18, max_value=120, value=85)
-monthly_investment = st.number_input("Monthly Installment (₹)", min_value=100, value=5000)
-step_up_rate = st.number_input("Annual Step-Up Rate (%)", min_value=0.0, value=5.0)
-sip_annual_rate = st.number_input("Annual Rate of Return During SIP (%)", min_value=0.0, value=12.0)
+current_age = st.number_input("Current Age", min_value=18, max_value=100, value=28)
+retirement_age = st.number_input("Expected Age to Retire", min_value=18, max_value=100, value=45)
+death_age = st.number_input("Expected Age of Death", min_value=18, max_value=120, value=90)
+monthly_investment = st.number_input("Monthly Installment (₹)", min_value=100, value=30000)
+step_up_rate = st.number_input("Annual Step-Up Rate (%)", min_value=0.0, value=2.0)
+sip_annual_rate = st.number_input("Annual Rate of Return During SIP (%)", min_value=0.0, value=13.0)
 post_annual_rate = st.number_input("Annual Rate of Return Post Retirement (%)", min_value=0.0, value=8.0)
-monthly_withdrawal = st.number_input("Monthly Withdrawal Post Retirement (₹)", min_value=100, value=20000)
-inflation_rate = st.number_input("Inflation Rate (%)", min_value=0.0, value=6.0)
+monthly_withdrawal = st.number_input("Monthly Withdrawal Post Retirement (₹)", min_value=100, value=100000)
+inflation_rate = st.number_input("Inflation Rate (%)", min_value=0.0, value=6.2)
 
 # Calculations
 years_to_retirement = retirement_age - current_age
