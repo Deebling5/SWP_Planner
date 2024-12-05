@@ -76,20 +76,20 @@ def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withd
 st.title("SIP & SWP Planner")
 
 # Input fields
-current_age = st.number_input("Current Age", min_value=18, max_value=100, value=30)
-retirement_age = st.number_input("Expected Age to Retire", min_value=current_age + 1, max_value=100, value=60)
-expected_death_age = st.number_input("Expected Age of Death", min_value=retirement_age + 1, max_value=120, value=85)
+current_age = st.number_input("Current Age", min_value=18, max_value=100, value=28)
+retirement_age = st.number_input("Expected Age to Retire", min_value=current_age + 1, max_value=100, value=45)
+expected_death_age = st.number_input("Expected Age of Death", min_value=retirement_age + 1, max_value=120, value=90)
 
-monthly_investment = st.number_input("Monthly SIP Installment (₹)", min_value=1000, value=5000)
-step_up_rate = st.number_input("Annual Step-Up Rate (%)", min_value=0.0, value=5.0)
-sip_annual_rate = st.number_input("Annual Rate of Return During SIP (%)", min_value=0.0, value=12.0)
+monthly_investment = st.number_input("Monthly SIP Installment (₹)", min_value=1000, value=30000)
+step_up_rate = st.number_input("Annual Step-Up Rate (%)", min_value=0.0, value=2.0)
+sip_annual_rate = st.number_input("Annual Rate of Return During SIP (%)", min_value=0.0, value=13.0)
 initial_investment = st.number_input("Initial Investment Before SIP Starts (₹)", min_value=0, value=100000)
 
-monthly_withdrawal = st.number_input("Monthly SWP Withdrawal (₹)", min_value=1000, value=20000)
-post_annual_rate = st.number_input("Post-Retirement Annual Rate of Return (%)", min_value=0.0, value=6.0)
-inflation_rate = st.number_input("Annual Inflation Rate (%)", min_value=0.0, value=3.0)
+monthly_withdrawal = st.number_input("Monthly SWP Withdrawal (₹)", min_value=1000, value=100000)
+post_annual_rate = st.number_input("Post-Retirement Annual Rate of Return (%)", min_value=0.0, value=9.0)
+inflation_rate = st.number_input("Annual Inflation Rate (%)", min_value=0.0, value=7.0)
 
-lumpsum_year = st.number_input("Year for Lumpsum Addition (Optional)", min_value=current_age, max_value=expected_death_age, value=0)
+lumpsum_year = st.number_input("Year for Lumpsum Addition (Optional)", min_value=current_age, max_value=expected_death_age, value=40)
 lumpsum_amount = st.number_input("Lumpsum Amount (₹)", min_value=0, value=0)
 
 # Calculations
