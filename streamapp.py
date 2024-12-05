@@ -55,7 +55,7 @@ def swp_planner(initial_investment, annual_rate, post_annual_rate, monthly_withd
         y = 1 - x  # Percentage for `post_annual_rate`
 
         # Calculate interest
-        interest = balance * (x / 100 * annual_rate / 12 / 100 + y / 100 * post_annual_rate / 12 / 100)
+        interest = balance * (x * annual_rate / 12 / 100 + y * post_annual_rate / 12 / 100)
         balance = balance + interest - monthly_withdrawal
 
         # Check for negative balance
